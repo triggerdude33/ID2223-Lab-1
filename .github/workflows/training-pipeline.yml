@@ -1,13 +1,10 @@
-name: Daily Feature Pipeline
+name: Training Pipeline
 
 on:
-  schedule:
-    # Run daily at 06:11 UTC (after sensor data updates)
-    - cron: '11 6 * * *'
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:  # Manual trigger only (run once or when retraining needed)
 
 jobs:
-  run-feature-pipeline:
+  run-training:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,11 +36,12 @@ jobs:
           echo "AQICN_CITY=stockholm" >> .env
           echo "AQICN_STREET=st-eriksgatan-83" >> .env
 
-      - name: Run daily feature pipeline
+      - name: Run training pipeline
         run: |
-          invoke aq-features
+          invoke aq-train
 
       - name: Show logs
         if: always()
         run: |
-          echo "Feature pipeline completed"
+          echo "Training pipeline completed"
+          echo "Model should now be registered in Hopsworks Model Registry"

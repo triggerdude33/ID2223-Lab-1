@@ -29,6 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           uv pip install --system --requirement pyproject.toml
+          pip install invoke
 
       - name: Create .env file
         run: |
@@ -42,7 +43,7 @@ jobs:
 
       - name: Run batch inference
         run: |
-          invoke aq_inference
+          invoke aq-inference
 
       - name: Configure Git
         run: |

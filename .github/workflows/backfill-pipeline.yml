@@ -1,13 +1,10 @@
-name: Daily Feature Pipeline
+name: Backfill Pipeline
 
 on:
-  schedule:
-    # Run daily at 06:11 UTC (after sensor data updates)
-    - cron: '11 6 * * *'
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch:  # Manual trigger only (run once to load historical data)
 
 jobs:
-  run-feature-pipeline:
+  run-backfill:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,12 +35,15 @@ jobs:
           echo "AQICN_COUNTRY=sweden" >> .env
           echo "AQICN_CITY=stockholm" >> .env
           echo "AQICN_STREET=st-eriksgatan-83" >> .env
+          echo "LATITUDE=59.33" >> .env
+          echo "LONGITUDE=18.07" >> .env
 
-      - name: Run daily feature pipeline
+      - name: Run backfill pipeline
         run: |
-          invoke aq-features
+          invoke aq-backfill
 
       - name: Show logs
         if: always()
         run: |
-          echo "Feature pipeline completed"
+          echo "Backfill pipeline completed"
+          echo "Feature groups should now exist in Hopsworks"
