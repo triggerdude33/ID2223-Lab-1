@@ -16,15 +16,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install uv
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
       - name: Install dependencies
         run: |
-          uv pip install --system --requirement pyproject.toml
-          pip install invoke
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install jupyter nbconvert
 
       - name: Create .env file
         run: |
@@ -38,7 +34,7 @@ jobs:
 
       - name: Run training pipeline
         run: |
-          invoke aq-train
+          jupyter nbconvert --to notebook --execute notebooks/airquality/3_air_quality_training_pipeline.ipynb
 
       - name: Show logs
         if: always()
