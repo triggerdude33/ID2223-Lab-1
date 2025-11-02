@@ -1,0 +1,62 @@
+name: Batch Inference & Dashboard Update
+
+on:
+  schedule:
+    # Run daily at 08:00 UTC (after feature pipeline completes)
+    - cron: '0 8 * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  run-batch-inference:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system --requirement pyproject.toml
+
+      - name: Create .env file
+        run: |
+          echo "HOPSWORKS_API_KEY=${{ secrets.HOPSWORKS_API_KEY }}" >> .env
+          echo "HOPSWORKS_PROJECT_NAME=matteusbID2223" >> .env
+          echo "AQICN_API_KEY=${{ secrets.AQICN_API_KEY }}" >> .env
+          echo "AQICN_URL=https://api.waqi.info/feed/@10523/" >> .env
+          echo "AQICN_COUNTRY=sweden" >> .env
+          echo "AQICN_CITY=stockholm" >> .env
+          echo "AQICN_STREET=st-eriksgatan-83" >> .env
+
+      - name: Run batch inference
+        run: |
+          invoke aq_inference
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push dashboard updates
+        run: |
+          git add docs/air-quality/assets/img/*.png || true
+          git diff --cached --quiet || git commit -m "Update dashboard: $(date +'%Y-%m-%d %H:%M UTC') [skip ci]"
+          git push || echo "No changes to push"
+
+      - name: Show logs
+        if: always()
+        run: |
+          echo "Batch inference completed"
+          ls -la docs/air-quality/assets/img/ || echo "No images directory"
