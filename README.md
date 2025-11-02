@@ -36,7 +36,6 @@ See [tutorial instructions here](https://docs.google.com/document/d/1YXfM1_rpo1-
 
 ## Feldera
 
-
 pip install feldera ipython-secrets
 sudo apt-get install python3-secretstorage
 sudo apt-get install gnome-keyring 
