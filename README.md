@@ -1,47 +1,30 @@
-# mlfs-book
-O'Reilly book - Building Machine Learning Systems with a feature store: batch, real-time, and LLMs
+# Air Quality Prediction System - Stockholm
 
+**Lab 1 - ID2223 Scalable Machine Learning @ KTH**
 
-## ML System Examples
+**Authors:** Emil Lidbom & Matteus Bäckström
 
+- **Project Repository:** [https://github.com/triggerdude33/ID2223-Lab-1](https://github.com/triggerdude33/ID2223-Lab-1)
+- **Live Dashboard:** [https://triggerdude33.github.io/ID2223-Lab-1/air-quality/](https://triggerdude33.github.io/ID2223-Lab-1/air-quality/)
 
-[Dashboards for Example ML Systems](https://featurestorebook.github.io/mlfs-book/)
+---
 
+### Air Quality Prediction ML System Summary
 
+This project is an automated, serverless MLOps system that predicts daily PM2.5 air quality for a monitoring station in Stockholm. The entire process is orchestrated by GitHub Actions, which connects data sources, a feature store, model training, and a public dashboard.
 
+Before the daily automation could begin, two manual one-time steps were required. First, a **backfill pipeline** was executed to load a large volume of historical air quality and weather data into the **Hopsworks Feature Store**. Following this, the **training pipeline** was run to create the first version of the XGBoost model from this historical data, which was then saved to the Hopsworks Model Registry.
 
-# Run Air Quality Tutorial
+With the initial data and model in place, the system now operates in a daily, automated cycle:
 
-See [tutorial instructions here](https://docs.google.com/document/d/1YXfM1_rpo1-jM-lYyb1HpbV9EJPN6i1u6h2rhdPduNE/edit?usp=sharing)
-    # Create a conda or virtual environment for your project
-    conda create -n book 
-    conda activate book
+1.  **Data Ingestion (GitHub Action):** A scheduled job runs daily to fetch the latest air quality data from the **AQICN API** and weather forecasts from the Open-Meteo API.
 
-    # Install 'uv' and 'invoke'
-    pip install invoke dotenv
+2.  **Feature Engineering & Storage (Hopsworks):** The new data is processed into features and appended to the existing feature groups in the **Feature Store**, ensuring a consistent and up-to-date data source.
 
-    # 'invoke install' installs python dependencies using uv and requirements.txt
-    invoke install
+3.  **Batch Inference (GitHub Action):** Shortly after, another scheduled job loads the latest features and the production-ready XGBoost model from the **Hopsworks Model Registry**.
 
+4.  **Prediction & Monitoring:** The pipeline generates a 7-day air quality forecast and creates a "hindcast" plot by comparing the previous day's prediction with the actual measurement to monitor model performance.
 
-## PyInvoke
-    invoke aq-backfill
-    invoke aq-features
-    invoke aq-train
-    invoke aq-inference
-    invoke aq-clean
+5.  **Dashboard Update (GitHub Pages):** The action automatically commits the new forecast and monitoring plots to the repository, instantly updating the public-facing **dashboard** hosted on **GitHub Pages**.
 
-
-
-## Feldera
-
-pip install feldera ipython-secrets
-sudo apt-get install python3-secretstorage
-sudo apt-get install gnome-keyring 
-
-mkdir -p /tmp/c.app.hopsworks.ai
-ln -s  /tmp/c.app.hopsworks.ai ~/hopsworks
-docker run -p 8080:8080 \
-  -v ~/hopsworks:/tmp/c.app.hopsworks.ai \
-  --tty --rm -it ghcr.io/feldera/pipeline-manager:latest
-
+In essence, after a one-time setup for historical data and initial model training, the project runs as a fully automated system where data flows from an external API, through a feature store to a model, with the final predictions published to a live dashboard—all managed by serverless CI/CD workflows.
