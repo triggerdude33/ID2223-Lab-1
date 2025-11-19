@@ -13,7 +13,11 @@
 
 This project is an automated, serverless MLOps system that predicts daily PM2.5 air quality for a monitoring station in Stockholm. The entire process is orchestrated by GitHub Actions, which connects data sources, a feature store, model training, and a public dashboard.
 
-Before the daily automation could begin, two manual one-time steps were required. First, a **backfill pipeline** was executed to load a large volume of historical air quality and weather data into the **Hopsworks Feature Store**. Following this, the **training pipeline** was run to create the first version of the XGBoost model from this historical data, which was then saved to the Hopsworks Model Registry.
+Before the daily automation could begin, two manual one-time steps were required. First, a **backfill pipeline** was executed. The backfill pipeline served the following purposes:
+1. Fetch metadata such as Air quality API keys, street name and geographical location and insert them into **Hopsworks secrets**.
+2. Using the metadata, load a large volume of historical air quality and weather data into the **Hopsworks Feature Store**. 
+
+Following this, the **training pipeline** was run to create the first version of the XGBoost model from this historical data, which was then saved to the Hopsworks Model Registry.
 
 With the initial data and model in place, the system now operates in a daily, automated cycle:
 
