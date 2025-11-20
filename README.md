@@ -2,7 +2,7 @@
 
 **Lab 1 - ID2223 Scalable Machine Learning @ KTH**
 
-**Authors:** Emil Lidbom & Matteus Bäckström
+**Authors:** Emil Lidbom & Matteus Berg
 
 - **Project Repository:** [https://github.com/triggerdude33/ID2223-Lab-1](https://github.com/triggerdude33/ID2223-Lab-1)
 - **Live Dashboard:** [https://triggerdude33.github.io/ID2223-Lab-1/air-quality/](https://triggerdude33.github.io/ID2223-Lab-1/air-quality/)
